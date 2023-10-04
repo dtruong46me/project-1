@@ -59,9 +59,9 @@ def main():
 
         count += 1
 
-        
-        for row in array:
-            print(' '.join(map(str, row)))
+        ## Change comment to Print Solution
+        # for row in array:
+        #     print(' '.join(map(str, row)))
 
         # return
     
@@ -73,13 +73,13 @@ if __name__ == '__main__':
     main()
 
 '''
-3 0 6 5 0 8 4 0 0
-5 2 0 0 0 0 0 0 0
-0 8 7 0 0 0 0 3 1
-0 0 3 0 1 0 0 8 0
-9 0 0 8 6 3 0 0 5
-0 5 0 0 9 0 6 0 0 
-1 3 0 0 0 0 2 5 0
-0 0 0 0 0 0 0 7 4
-0 0 5 2 0 6 3 0 0
+0 0 3 4 0 0 0 8 9
+0 0 6 7 8 9 0 2 3
+0 8 0 0 2 3 4 5 6
+0 0 4 0 6 5 0 9 7
+0 6 0 0 9 0 0 1 4
+0 0 7 2 0 4 3 6 5
+0 3 0 6 0 2 0 7 8
+0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0
 '''

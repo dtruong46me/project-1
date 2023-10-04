@@ -1,5 +1,7 @@
 
 def main():
+    MOD=10**9+7
+
     k, n = [int(x) for x in input().split()]
 
     if k==1:
@@ -19,9 +21,9 @@ def main():
         for j in range(1, n+1):
 
             # C_k_n = C_k-1_n-1 + C_k_n-1
-            dp[i][j] = dp[i-1][j-1] + dp[i][j-1]
+            dp[i][j] = (dp[i-1][j-1] + dp[i][j-1]) % MOD
     
-    print(dp[k][n])
+    print(int(dp[k][n]))
 
 if __name__ == '__main__':
     main()

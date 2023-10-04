@@ -13,7 +13,10 @@ def main():
 
     def Try(k):
         if k == n+1 and sum(x[1:n+1])==m:
-            print(' '.join(map(str, x[1:])))
+            # print(' '.join(map(str, x[1:])))
+            for i in range(1, n+1):
+                print(x[i], end=' ')
+            print()
         
         if k <= n:
             for i in range(1, m):
