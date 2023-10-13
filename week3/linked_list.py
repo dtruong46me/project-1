@@ -94,27 +94,44 @@ class LinkedList:
             prev_node.next = new_node
     
     # Remove Node(k)
-    def remove(self, k: int):
-        curr_node = self.root
-        prev_node = None
-
-        check_k = self.check(k)
-        if check_k is None:
-            return
-
-        while curr_node is not None and curr_node.value == k:
-            self.root = curr_node.next
+    def remove(self, k: int, remove_all=False):
+        # Remove only 1 node with value k
+        if remove_all == False:
+            if self.root is None:
+                return
+            
+            if self.root.value == k:
+                self.root = self.root.next
+                return
+            
             curr_node = self.root
+            while curr_node is not None:
+                if curr_node.next is not None and curr_node.next.value == k:
+                    curr_node.next = curr_node.next.next
+                    return
+                curr_node = curr_node.next
         
-        while curr_node is not None and curr_node.value != k:
-            prev_node = curr_node
-            curr_node = curr_node.next
-        
-        if curr_node is None:
-            return self.root
-        
-        prev_node.next = curr_node.next
-        curr_node = prev_node.next
+        # Remove all nodes with value k
+        if remove_all == True:
+            curr_node = self.root
+            prev_node = None
+
+            while curr_node is not None:
+                if curr_node.value == k:
+                    # Node(k) is at the head
+                    if prev_node is None:
+                        self.root = curr_node.next
+
+                    # Node(k) is at the middle or tail
+                    else:
+                        assert isinstance(prev_node, Node)
+                        prev_node.next = curr_node.next
+                    
+                    curr_node = curr_node.next
+                
+                else:
+                    prev_node = curr_node
+                    curr_node = curr_node.next
 
     # Reverse Linked List
     def reverse(self):
