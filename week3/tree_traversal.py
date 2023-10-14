@@ -23,7 +23,6 @@ class Tree:
             return 
         
         if root.value == v:
-            print("Found", v)
             return root
 
         curr_node = root.left
@@ -39,13 +38,13 @@ class Tree:
         return
     
     # Insert Node(u) - The child of Node(v) 
-    def insert_(self, u:int, v:int):
-        new_node = Node(value=u)
+    def insert_(self, u: int, v: int):
+        new_node = Node(u)
 
         if self.root is None:
             return
         
-        # If the Node(u) and Node(v) are exist, do nothing
+        # If the Node(u) is exist or Node(v) is not exist, do nothing
         if self.find_node(u, self.root) is not None:
             return
         
@@ -53,21 +52,14 @@ class Tree:
             return
         
         # Find the current node with the value "v"
-        print(v)
         parent_node = self.find_node(v, self.root)
-        print("parent_node:", parent_node)
-
-        if parent_node is None:
-            return
 
         if parent_node.left is None:
             parent_node.left = new_node
-            print("inserted", u, v)
         
         else:
             curr_node = parent_node.left
-            assert type(curr_node) == Node
-
+            assert isinstance(curr_node, Node)
             while curr_node.right is not None:
                 curr_node = curr_node.right
             
@@ -77,45 +69,43 @@ class Tree:
         if root is None:
             return
 
-        if root is not None:
-            print(root.value, end='--')
+        print(root.value, end=' ')
 
-        curr_node =root.left
+        curr_node = root.left
 
         while curr_node is not None:
+            assert isinstance(curr_node, Node)
             self.pre_order(curr_node)
-
             curr_node = curr_node.right
         
     
-    def in_order(self, root=None) -> None:
+    def in_order(self, root:Node) -> None:
         if root is None:
             return
         
-        if root is not None:
-            assert isinstance(root, Node)
-            if root.left is not None:
-                self.in_order(root.left)
-            
-            curr_node = root.left
-            # assert isinstance(curr_node, Node)
+        self.in_order(root.left)
 
-            while curr_node is not None:
-                print(curr_node.value, end='--')
-                self.in_order(curr_node)
-                curr_node = curr_node.right
-    
-    def post_order(self, root=None) -> None:
-        if root is None:
-            return
-        
+        print(root.value, end=' ')
+
         curr_node = root.left
+        
         while curr_node is not None:
+            if curr_node.right is not None:
+                self.in_order(curr_node.right)
+            curr_node = curr_node.right
+    
+    def post_order(self, root: Node) -> None:
+        curr_node = root.left
+
+        while curr_node is not None:
+            assert isinstance(curr_node, Node)
             self.post_order(curr_node)
             curr_node = curr_node.right
         
-        if curr_node is not None:
-            print(curr_node, end='--')
+        if root is None:
+            return
+        
+        print(root.value, end=' ')
 
 def main():
 
@@ -140,12 +130,15 @@ def main():
 
         if cmd[0] == 'PreOrder':
             tree.pre_order(tree.root)
+            print()
 
         if cmd[0] == 'InOrder':
-            tree.in_order()
+            tree.in_order(tree.root)
+            print()
 
         if cmd[0] == 'PostOrder':
-            tree.post_order()
+            tree.post_order(tree.root)
+            print()
 
     return
 
