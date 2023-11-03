@@ -6,6 +6,7 @@ class Graph:
         self.n = n
         self.nodes = {x: [] for x in range(1, n+1)}
 
+    # Not using Priority Queue
     def dijkstra(self, source, target):
         distance = {x: float('inf') for x in range(1, self.n+1)}
         distance[source] = 0
@@ -27,6 +28,11 @@ class Graph:
 
         return distance[target]
 
+
+    # Using Priority Queue
+    def dijkstra_pq(self, source, target):
+
+        return
         
 
 def main():
