@@ -14,10 +14,15 @@ class SalesOrder:
             cus_id, prod_id, price, shop_id, time = [x for x in line]
 
             if shop_id not in self.shops:
-                self.shops[shop_id] = [(cus_id, prod_id, price)]
+                self.shops[shop_id] = dict()
+                self.shops[shop_id][cus_id] = [int(price)]
             
             else:
-                self.shops[shop_id].append((cus_id, prod_id, price))
+                if cus_id not in self.shops[shop_id]:
+                    self.shops[shop_id][cus_id] = [int(price)]
+                    
+                else:
+                    self.shops[shop_id][cus_id].append(int(price))
         
         while True:
             line = sys.stdin.readline().split()
@@ -27,14 +32,19 @@ class SalesOrder:
     
     # Total number of Orders
     def total_number_orders(self) -> int:
-        return sum([len(self.shops[x]) for x in self.shops.keys()])
+        orders = 0
+
+        for shop in self.shops.keys():
+            orders += sum(len(self.shops[shop][cus]) for cus in self.shops[shop].keys())
+
+        return orders
     
     # Total revenue of data
     def total_revenue(self) -> int:
         revenue = 0
 
-        for shop in self.shops:
-            revenue += sum(int(self.shops[shop][x][2]) for x in range(len(self.shops[shop])))
+        for shop in self.shops.keys():
+            revenue += sum(sum(self.shops[shop][cus]) for cus in self.shops[shop].keys())
 
         return revenue 
 
@@ -42,11 +52,17 @@ class SalesOrder:
     def revenue_of_shop(self, shop_id:str) -> int:
         if shop_id not in self.shops:
             return 0
-        return sum(int(self.shops[shop_id][x][2]) for x in range(len(self.shops[shop_id])))
+        return sum(sum(self.shops[shop_id][cus]) for cus in self.shops[shop_id].keys())
 
     # Total consume of customer <customer_id> at shop <shop_id>
     def total_consume_of_customer_shop(self, customer_id:str, shop_id:str) -> int:
-        return
+        if shop_id not in self.shops:
+            return 0
+        
+        if customer_id not in self.shops[shop_id]:
+            return 0
+        
+        return sum(self.shops[shop_id][customer_id])
 
     # Total revenue in period <from_time> to <to_time>
     def toal_revenue_in_period(self, from_time, to_time) -> int:
