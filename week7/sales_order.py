@@ -1,9 +1,11 @@
 import sys
+from datetime import datetime
 
 class SalesOrder:
     def __init__(self) -> None:
         self.queries = []
         self.shops = dict()
+        self.orders = list()
 
     # Read Input
     def read_input(self):
@@ -12,23 +14,24 @@ class SalesOrder:
             if line[0] == '#':
                 break
             cus_id, prod_id, price, shop_id, time = [x for x in line]
+            time = datetime.strptime(time, '%H:%M:%S')
+
+            self.orders.append((time, int(price)))
 
             if shop_id not in self.shops:
                 self.shops[shop_id] = dict()
-                self.shops[shop_id][cus_id] = [int(price)]
             
-            else:
-                if cus_id not in self.shops[shop_id]:
-                    self.shops[shop_id][cus_id] = [int(price)]
-                    
-                else:
-                    self.shops[shop_id][cus_id].append(int(price))
+            if cus_id not in self.shops[shop_id]:
+                self.shops[shop_id][cus_id] = []
+            
+            self.shops[shop_id][cus_id].append(int(price))
         
         while True:
             line = sys.stdin.readline().split()
             if line[0] == '#':
                 break
             self.queries.append(line)
+        
     
     # Total number of Orders
     def total_number_orders(self) -> int:
@@ -66,8 +69,16 @@ class SalesOrder:
 
     # Total revenue in period <from_time> to <to_time>
     def toal_revenue_in_period(self, from_time, to_time) -> int:
-        return
-    
+        revenue = 0
+
+        from_time = datetime.strptime(from_time, '%H:%M:%S')
+        to_time = datetime.strptime(to_time, '%H:%M:%S')
+
+        for order in self.orders:
+            if order[0] >= from_time and order[0] <= to_time:
+                revenue += order[1]
+        
+        return revenue
 
     # Handle requests
     def handle_requests(self):
