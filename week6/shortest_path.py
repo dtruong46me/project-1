@@ -1,5 +1,6 @@
 
 import sys
+import queue
 
 class Graph:
     def __init__(self, n) -> None:
@@ -31,8 +32,28 @@ class Graph:
 
     # Using Priority Queue
     def dijkstra_pq(self, source, target):
+        distance = {x: float('inf') for x in range(1, self.n+1)}
+        distance[source] = 0
+        priority_queue = queue.PriorityQueue()
+        priority_queue.put((0, source))
 
-        return
+        while not priority_queue.empty():
+            dist_u, u = priority_queue.get()
+
+            if u == target:
+                break
+
+            if dist_u > distance[u]:
+                continue
+
+            for v, w in self.nodes[u]:
+                tmp_dist = distance[u] + w
+
+                if tmp_dist < distance[v]:
+                    distance[v] = tmp_dist
+                    priority_queue.put((distance[v], v))
+
+        return distance[target]
         
 
 def main():
@@ -48,7 +69,7 @@ def main():
     
     s, t = [int(x) for x in sys.stdin.readline().split()]
 
-    result = graph.dijkstra(source=s, target=t)
+    result = graph.dijkstra_pq(source=s, target=t)
 
     print(result)
 
