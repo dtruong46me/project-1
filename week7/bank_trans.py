@@ -71,23 +71,27 @@ class Transaction:
     def inspect_cycle(self, account: str, k: str) -> bool:
         if account not in self.transactions:
             return False
-        ### CODE HERE
 
-        def dfs(node, start, k: int):
+        def dfs(node, start, k: int, visited: set):
             if k == 0:
                 if node == start:
                     return True
                 return False
             
+            visited.add(node)
+            
             if node in self.transactions:
                 for _, next_node in self.transactions[node]:
-                    if dfs(next_node, start, k-1):
+                    if dfs(next_node, start, k-1, visited):
                         return True
             
+            visited.remove(node)
             return False
+
+        visited = set()
         
         for _, next_node in self.transactions[account]:
-            if dfs(next_node, account, int(k)-1):
+            if dfs(next_node, account, int(k)-1, visited):
                 return True
 
         return False

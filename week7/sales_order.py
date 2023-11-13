@@ -1,11 +1,47 @@
 import sys
 from datetime import datetime
 
+class SegmentTree:
+    def __init__(self, data: list) -> None:
+        self.data = data
+        self.tree = [0] * (4*len(data))
+        self.build(1, 0, len(data) - 1)
+    
+    def build(self, node, start, end):
+        if start == end:
+            self.tree[node] = self.data[start]
+        
+        else:
+            mid = (start + end) // 2
+            left = node * 2
+            right = node * 2 + 1
+            self.build(left, start, mid)
+            self.build(right, mid + 1, end)
+            self.tree[node] = self.tree[left] + self.tree[right]
+    
+    def query(self, node, start, end, left, right):
+        # left > right
+        if start > right and end < left:
+            return 0
+        
+        # left < start < end < right
+        if start >= left and end <= right:
+            return self.tree[node]
+        
+        mid = (start + end) // 2
+        left_node = node * 2
+        right_node = node * 2 + 1
+        left_sum = self.query(left_node, start, mid, left, right)
+        right_sum = self.query(right_node, mid+1, end, left, right)
+        return left_sum + right_sum
+
+
 class SalesOrder:
     def __init__(self) -> None:
         self.queries = []
         self.shops = dict()
         self.orders = list()
+        self.segment_tree = dict()
 
     # Read Input
     def read_input(self):
@@ -26,11 +62,18 @@ class SalesOrder:
             
             self.shops[shop_id][cus_id].append(int(price))
         
+        self.build_segment_tree()
+        
         while True:
             line = sys.stdin.readline().split()
             if line[0] == '#':
                 break
             self.queries.append(line)
+
+    
+    def build_segment_tree(self):
+        
+        pass
         
     
     # Total number of Orders
@@ -74,10 +117,6 @@ class SalesOrder:
         from_time = datetime.strptime(from_time, '%H:%M:%S')
         to_time = datetime.strptime(to_time, '%H:%M:%S')
 
-        for order in self.orders:
-            if order[0] >= from_time and order[0] <= to_time:
-                revenue += order[1]
-        
         return revenue
 
     # Handle requests
