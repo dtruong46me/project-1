@@ -82,7 +82,7 @@ class Transaction:
             
             if node in self.transactions:
                 for _, next_node in self.transactions[node]:
-                    if dfs(next_node, start, k-1, visited):
+                    if next_node not in visited and dfs(next_node, start, k-1, visited):
                         return True
             
             visited.remove(node)
