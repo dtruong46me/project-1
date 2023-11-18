@@ -5,43 +5,37 @@ class SegmentTree:
     def __init__(self, data: list) -> None:
         self.data = data
         self.tree = [0] * (4*len(data))
-        self.build(1, 0, len(data) - 1)
-    
-    def build(self, node, start, end):
+        self.build_tree(1, 0, len(data) - 1)
+
+    def build_tree(self, node, start, end):
         if start == end:
             self.tree[node] = self.data[start]
         
         else:
             mid = (start + end) // 2
-            left = node * 2
-            right = node * 2 + 1
-            self.build(left, start, mid)
-            self.build(right, mid + 1, end)
-            self.tree[node] = self.tree[left] + self.tree[right]
-    
+            left_child = 2 * node
+            right_child = 2 * node + 1
+            self.build_tree(left_child, start, mid)
+            self.build_tree(right_child, mid+1, end)
+            self.tree[node] = self.tree[left_child] + self.tree[right_child]
+
     def query(self, node, start, end, left, right):
-        # left > right
-        if start > right and end < left:
+        if left > end or right < start:
             return 0
         
-        # left < start < end < right
-        if start >= left and end <= right:
+        if left <= start and right >= end:
             return self.tree[node]
         
         mid = (start + end) // 2
-        left_node = node * 2
-        right_node = node * 2 + 1
-        left_sum = self.query(left_node, start, mid, left, right)
-        right_sum = self.query(right_node, mid+1, end, left, right)
-        return left_sum + right_sum
-
+        left_child = 2 * node
+        right_child = 2 * node + 1
+        return self.query(left_child, start, mid, left, right) + self.query(right_child, mid+1, end, left, right)
 
 class SalesOrder:
     def __init__(self) -> None:
         self.queries = []
         self.shops = dict()
         self.orders = list()
-        self.segment_tree = dict()
 
     # Read Input
     def read_input(self):
@@ -62,19 +56,11 @@ class SalesOrder:
             
             self.shops[shop_id][cus_id].append(int(price))
         
-        self.build_segment_tree()
-        
         while True:
             line = sys.stdin.readline().split()
             if line[0] == '#':
                 break
             self.queries.append(line)
-
-    
-    def build_segment_tree(self):
-        
-        pass
-        
     
     # Total number of Orders
     def total_number_orders(self) -> int:
@@ -98,7 +84,7 @@ class SalesOrder:
     def revenue_of_shop(self, shop_id:str) -> int:
         if shop_id not in self.shops:
             return 0
-        return sum(sum(self.shops[shop_id][cus]) for cus in self.shops[shop_id].keys())
+        return 
 
     # Total consume of customer <customer_id> at shop <shop_id>
     def total_consume_of_customer_shop(self, customer_id:str, shop_id:str) -> int:
@@ -116,6 +102,10 @@ class SalesOrder:
 
         from_time = datetime.strptime(from_time, '%H:%M:%S')
         to_time = datetime.strptime(to_time, '%H:%M:%S')
+
+        for order_time, price in self.orders:
+            if from_time <= order_time <= to_time:
+                revenue + price
 
         return revenue
 

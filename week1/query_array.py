@@ -7,9 +7,10 @@ class SegmentTree:
         self.build(array, 1, 0, self.n - 1)
 
     def build(self, array, v, tl, tr):
+        print("build:", v, tl, tr, array[tl], array[tr])
         if tl == tr:
             self.tree[v] = array[tl]
-        
+            
         else:
             tm = (tl + tr) // 2
             self.build(array, v * 2, tl, tm)
@@ -17,6 +18,7 @@ class SegmentTree:
             self.tree[v] = max(self.tree[v * 2], self.tree[v * 2 + 1])
     
     def query(self, v, tl, tr, l, r):
+        print(f"max: {v} {tl} {tr} {l} {r}")
         if l > r:
             return float('-inf')
         
@@ -67,6 +69,10 @@ def main():
     _ = input()
 
     segment_tree = SegmentTree(array)
+    for i, v in enumerate(segment_tree.tree):
+        print(f"[{i} {v}]")
+    
+    print()
 
     result = []
 
@@ -94,8 +100,4 @@ def main():
     # return
 
 if __name__ == '__main__':
-    # start_time = time()
     main()
-    # end_time = time()
-
-    # print(f"Execution time: {(end_time - start_time):.5f}")
