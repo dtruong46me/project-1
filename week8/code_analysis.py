@@ -3,7 +3,8 @@ from datetime import datetime
 
 class SubmissionContest:
     def __init__(self) -> None:
-        self.submissions = list()
+        self.submissions = dict()
+        self.user_points = dict()
         self.queries = []
 
     def read_input(self):
@@ -15,7 +16,17 @@ class SubmissionContest:
 
             user_id, problem_id, time_point, status, point = line
             time_point = datetime.strptime(time_point, '%H:%M:%S')
-            self.submissions.append((user_id, problem_id, time_point, status, int(point)))
+            
+            key = (user_id, problem_id)
+            submission = (time_point, status, int(point))
+
+            if key not in self.submissions:
+                self.submissions[key] = []
+
+            self.submissions[key].append(submission)
+            
+            if key not in self.user_points or int(point) > self.user_points[key]:
+                self.user_points[key] = int(point)
 
         while True:
             line = [x for x in sys.stdin.readline().split()]
@@ -28,32 +39,43 @@ class SubmissionContest:
 
     # Total number of submissions
     def total_number_submissions(self) -> int:
-        return len(self.submissions)
-    
+        return sum(len(submissions) for submissions in self.submissions.values())
+
+
     # Total number of ERR submissions
     def number_error_submission(self) -> int:
-        return sum(1 for _, _, _, status, _ in self.submissions if status == 'ERR')
+        error_submission = 0
+        
+        for submission in self.submissions.values():
+            error_submission += sum(1 for _, status, _ in submission if status=='ERR')
+
+        return error_submission
+
 
     # Total number of ERR submission of <UserID>
     def number_error_submission_of_user(self, user_id: str) -> int:
-        return sum(1 for uid, _, _, status, _ in self.submissions if uid==user_id and status=='ERR')
-    
+        error_submission = 0
+
+        for key, submission in self.submissions.items():
+            if key[0] == user_id:
+                error_submission += sum(1 for _, status, _ in submission if status=='ERR')
+        
+        return error_submission
+
+
     # Total point of <UserID>
     def total_point_of_user(self, user_id: str) -> int:
-        user_points = {problem_id: 0 for _, problem_id, _, _, _ in self.submissions if user_id == user_id}
-        for uid, problem_id, _, _, point in self.submissions:
-            if uid == user_id and point > user_points[problem_id]:
-                user_points[problem_id] = point
         
-        return sum(user_points.values())
+        return sum(point for key, point in self.user_points.items() if key[0] == user_id)
     
+
     # Number of submissions from <from_time_point> to <to_time_point>
     def number_submission_period(self, from_time_point, to_time_point) -> int:
         from_time_point = datetime.strptime(from_time_point, '%H:%M:%S')
         to_time_point = datetime.strptime(to_time_point, '%H:%M:%S')
 
-        return sum(1 for _, _, time_point, _, _ in self.submissions if from_time_point <= time_point <= to_time_point)
-    
+        return sum(1 for submissions in self.submissions.values() for time_point, _, _ in submissions if from_time_point <= time_point <= to_time_point)
+
 
     # Handle requests
     def handle_requests(self):
