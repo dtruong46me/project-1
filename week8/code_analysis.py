@@ -15,7 +15,6 @@ class SubmissionContest:
                 break
 
             user_id, problem_id, time_point, status, point = line
-            time_point = datetime.strptime(time_point, '%H:%M:%S')
             
             key = (user_id, problem_id)
             submission = (time_point, status, int(point))
@@ -44,28 +43,16 @@ class SubmissionContest:
 
     # Total number of ERR submissions
     def number_error_submission(self) -> int:
-        error_submission = 0
-        
-        for submission in self.submissions.values():
-            error_submission += sum(1 for _, status, _ in submission if status=='ERR')
-
-        return error_submission
+        return sum(sum(1 for _, status, _ in submission if status=='ERR') for submission in self.submissions.values())
 
 
     # Total number of ERR submission of <UserID>
     def number_error_submission_of_user(self, user_id: str) -> int:
-        error_submission = 0
-
-        for key, submission in self.submissions.items():
-            if key[0] == user_id:
-                error_submission += sum(1 for _, status, _ in submission if status=='ERR')
-        
-        return error_submission
+        return sum(sum(1 for _, status, _ in submission if status=='ERR') for key, submission in self.submissions.items() if key[0] == user_id)
 
 
     # Total point of <UserID>
     def total_point_of_user(self, user_id: str) -> int:
-        
         return sum(point for key, point in self.user_points.items() if key[0] == user_id)
     
 
@@ -74,7 +61,7 @@ class SubmissionContest:
         from_time_point = datetime.strptime(from_time_point, '%H:%M:%S')
         to_time_point = datetime.strptime(to_time_point, '%H:%M:%S')
 
-        return sum(1 for submissions in self.submissions.values() for time_point, _, _ in submissions if from_time_point <= time_point <= to_time_point)
+        return sum(1 for submissions in self.submissions.values() for time_point, _, _ in submissions if from_time_point <= datetime.strptime(time_point, '%H:%M:%S') <= to_time_point)
 
 
     # Handle requests

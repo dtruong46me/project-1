@@ -1,36 +1,6 @@
 import sys
 from datetime import datetime
 
-class SegmentTree:
-    def __init__(self, data: list) -> None:
-        self.data = data
-        self.tree = [0] * (4*len(data))
-        self.build_tree(1, 0, len(data) - 1)
-
-    def build_tree(self, node, start, end):
-        if start == end:
-            self.tree[node] = self.data[start]
-        
-        else:
-            mid = (start + end) // 2
-            left_child = 2 * node
-            right_child = 2 * node + 1
-            self.build_tree(left_child, start, mid)
-            self.build_tree(right_child, mid+1, end)
-            self.tree[node] = self.tree[left_child] + self.tree[right_child]
-
-    def query(self, node, start, end, left, right):
-        if left > end or right < start:
-            return 0
-        
-        if left <= start and right >= end:
-            return self.tree[node]
-        
-        mid = (start + end) // 2
-        left_child = 2 * node
-        right_child = 2 * node + 1
-        return self.query(left_child, start, mid, left, right) + self.query(right_child, mid+1, end, left, right)
-
 class SalesOrder:
     def __init__(self) -> None:
         self.queries = []
@@ -44,7 +14,6 @@ class SalesOrder:
             if line[0] == '#':
                 break
             cus_id, prod_id, price, shop_id, time = [x for x in line]
-            time = datetime.strptime(time, '%H:%M:%S')
 
             self.orders.append((time, int(price)))
 
@@ -84,7 +53,8 @@ class SalesOrder:
     def revenue_of_shop(self, shop_id:str) -> int:
         if shop_id not in self.shops:
             return 0
-        return 
+        
+        return sum(sum(self.shops[shop_id][cus]) for cus in self.shops[shop_id].keys())
 
     # Total consume of customer <customer_id> at shop <shop_id>
     def total_consume_of_customer_shop(self, customer_id:str, shop_id:str) -> int:
@@ -98,16 +68,8 @@ class SalesOrder:
 
     # Total revenue in period <from_time> to <to_time>
     def toal_revenue_in_period(self, from_time, to_time) -> int:
-        revenue = 0
 
-        from_time = datetime.strptime(from_time, '%H:%M:%S')
-        to_time = datetime.strptime(to_time, '%H:%M:%S')
-
-        for order_time, price in self.orders:
-            if from_time <= order_time <= to_time:
-                revenue + price
-
-        return revenue
+        return 
 
     # Handle requests
     def handle_requests(self):
