@@ -1,59 +1,64 @@
-import sys
-from datetime import datetime
 
-class SaleOrders:
+import sys
+
+class SaleOrder:
     def __init__(self) -> None:
         self.queries = list()
-        self.shops = [list() for _ in range(1000)]
+        self.shops = dict()
         self.orders = list()
-        self.count_order = 0
-        self.revenue = 0
-    
-    def handle_input(self):
+
+    def read_input(self):
         while True:
-            line = [x for x in sys.stdin.readline().split()]
+            line = sys.stdin.readline().split()
             if line[0] == '#':
                 break
+
             cus_id, prod_id, price, shop_id, timepoint = line
-            price = int(price)
-            timepoint = datetime.strptime(timepoint, '%H:%M:%S')
 
-            shop_idx = int(shop_id[1:])
+            self.orders.append((timepoint, int(price)))
 
-            self.shops[shop_idx].append((cus_id, price))
-            self.orders.append((price, timepoint))
-            self.count_order += 1
-            self.revenue += price
+            if shop_id not in self.shops:
+                self.shops[shop_id] = dict()
+            
+            if cus_id not in self.shops[shop_id]:
+                self.shops[shop_id][cus_id] = []
+            
+            self.shops[shop_id][cus_id].append(int(price))
 
         while True:
-            line = [x for x in sys.stdin.readline().split()]
+            line = sys.stdin.readline().split()
             if line[0] == '#':
                 break
             self.queries.append(line)
-    
-    def total_number_orders(self) -> int:
-        return self.count_order
-    
-    def total_revenue(self) -> int:
-        return self.revenue
-    
-    def revenue_of_shop(self, shop_id: str) -> int:
-        shop_idx = int(shop_id[1:])
-        if len(self.shops[shop_idx]) == 0:
-            return 0
-        return sum(price for _, price in self.shops[shop_idx])
-    
-    def total_consume_of_customer_shop(self, cus_id, shop_id):
-        shop_idx = int(shop_id[1:])
-        if len(self.shops[shop_idx]) == 0 or cus_id not in self.shops[shop_idx]:
-            return 0
-        return sum(price for cus, price in self.shops[shop_idx] if cus == cus_id)
-    
-    def total_revenue_in_period(self, from_time:str, to_time:str):
-        from_time = datetime.strptime(from_time, '%H:%M:%S')
-        to_time = datetime.strptime(to_time, '%H:%M:%S')
-        return sum(price for price, timepoint in self.orders if from_time <= timepoint <= to_time)
 
+    def total_number_orders(self):
+        return sum(sum(len(orders) for orders in self.shops[shop].values()) for shop in self.shops.keys())
+    
+    def total_revenue(self):
+        return sum(sum(sum(orders) for orders in self.shops[shop].values()) for shop in self.shops.keys())
+    
+    def revenue_of_shop(self, shopid: str) -> int:
+        if shopid not in self.shops.keys():
+            return 0
+        return sum(sum(sum(orders) for orders in self.shops[shop].values()) for shop in self.shops.keys() if shop==shopid)
+    
+    def total_cunsume_of_customer_shop(self, cusid: str, shopid: str) -> int:
+        if shopid not in self.shops.keys():
+            return 0
+        if cusid not in self.shops[shopid].keys():
+            return 0
+        return sum(sum(sum(orders) for cus, orders in self.shops[shop].items() if cus==cusid) for shop in self.shops.keys() if shop==shopid)
+    
+    def total_revenue_in_period(self, start_time: str, end_time: str) -> int:
+        self.orders.sort(key=lambda x: x[0])
+
+        total_revenue = 0
+        for timepoint, price in self.orders:
+            if timepoint >= start_time and timepoint <= end_time:
+                total_revenue += price
+        
+        return total_revenue
+    
     def handle_requests(self):
         for query in self.queries:
             if query[0] == '?total_number_orders':
@@ -61,20 +66,21 @@ class SaleOrders:
             
             if query[0] == '?total_revenue':
                 print(self.total_revenue())
-
+            
             if query[0] == '?revenue_of_shop':
                 print(self.revenue_of_shop(query[1]))
-
-            if query[0] == '?total_consume_of_customer_shop':
-                print(self.total_consume_of_customer_shop(query[1], query[2]))
             
+            if query[0] == '?total_consume_of_customer_shop':
+                print(self.total_cunsume_of_customer_shop(query[1], query[2]))
+
             if query[0] == '?total_revenue_in_period':
                 print(self.total_revenue_in_period(query[1], query[2]))
-   
+
+
 def main():
-    sale_db = SaleOrders()
-    sale_db.handle_input()
-    sale_db.handle_requests()
+    sales = SaleOrder()
+    sales.read_input()
+    sales.handle_requests()
 
 if __name__ == '__main__':
     main()
