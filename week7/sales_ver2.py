@@ -5,7 +5,12 @@ class SaleOrder:
     def __init__(self) -> None:
         self.queries = list()
         self.shops = dict()
-        self.orders = list()
+        self.orders = [0 for _ in range(24*60*60+1)]
+    
+    def convert_date(self, datestring: str) -> int:
+        # datestring: 10:45:30 -> 10*60*60 + 45*60 + 30
+        hh, mm, ss = [int(x) for x in datestring.split(':')]
+        return hh*60*60 + mm*60 + ss
 
     def read_input(self):
         while True:
@@ -15,7 +20,11 @@ class SaleOrder:
 
             cus_id, prod_id, price, shop_id, timepoint = line
 
-            self.orders.append((timepoint, int(price)))
+            time_index = self.convert_date(timepoint)
+            if self.orders[time_index] != 0:
+                self.orders[time_index] += int(price)
+            else:
+                self.orders[time_index] = int(price)
 
             if shop_id not in self.shops:
                 self.shops[shop_id] = dict()
@@ -50,15 +59,11 @@ class SaleOrder:
         return sum(sum(sum(orders) for cus, orders in self.shops[shop].items() if cus==cusid) for shop in self.shops.keys() if shop==shopid)
     
     def total_revenue_in_period(self, start_time: str, end_time: str) -> int:
-        self.orders.sort(key=lambda x: x[0])
+        start = self.convert_date(start_time)
+        end = self.convert_date(end_time)
 
-        total_revenue = 0
-        for timepoint, price in self.orders:
-            if timepoint >= start_time and timepoint <= end_time:
-                total_revenue += price
-        
-        return total_revenue
-    
+        return sum(self.orders[start:end])
+
     def handle_requests(self):
         for query in self.queries:
             if query[0] == '?total_number_orders':
